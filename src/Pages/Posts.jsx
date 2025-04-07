@@ -4,10 +4,10 @@ import axios from "axios";
 const Post = () => {
   const [posts, setPosts] = useState([]);
   const [expandedPosts, setExpandedPosts] = useState({});
-
+const backend=import.meta.env.VITE_BACKEND_URL
   useEffect(() => {
     axios
-      .get("http://localhost:2400/post")
+      .get(`${backend}/post`)
       .then((response) => {
         const fetchedPosts = response.data;
         setPosts(fetchedPosts);
