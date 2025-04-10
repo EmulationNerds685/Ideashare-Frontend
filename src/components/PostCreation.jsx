@@ -1,124 +1,195 @@
-import { Button, Dialog, DialogTitle, DialogContent, DialogActions,} from "@mui/material"
-import {useState} from "react"
-import axios from 'axios'
-import { CircularProgress } from "@mui/material";
+import { Button, Dialog, DialogTitle, DialogContent, DialogActions, CircularProgress } from "@mui/material";
+import { useState, useEffect } from "react";
+import axios from 'axios';
+import { useLocation, useNavigate } from 'react-router-dom';
 
+const PostCreation = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const editingPost = location.state?.postdata || null;
 
+  const [msg, setmsg] = useState("");
+  const [resmsg, setresmsg] = useState("");
+  const [open, setopen] = useState(false);
+  const [loading, setloading] = useState(false);
+  const [data, setData] = useState({
+    title: "",
+    content: "",
+    author: ""
+  });
 
-const PostCreation=()=>{
-  const [msg,setmsg]=useState("")
-  const [resmsg,setresmsg]=useState("")
-const [open,setopen]=useState(false)
-const [loading,setloading]=useState(false)
-const [data,setData]=useState({
-  title:"",
-  content:"",
-  author:""
-})
+  const backend = import.meta.env.VITE_BACKEND_URL;
 
-const backend=import.meta.env.VITE_BACKEND_URL
+  useEffect(() => {
+    if (editingPost) {
+      setData({
+        code: editingPost.code,
+        title: editingPost.title,
+        content: editingPost.content,
+        author: editingPost.author
+      });
+    }
+  }, [editingPost]);
 
-function handleClose(){
-setopen(false)
-}
+  function handleClose() {
+    setopen(false);
+    navigate('/posts');
+  }
 
-function handleChange(e){
-    setData({...data,[e.target.name]:e.target.value})
-    
-}
+  function handleChange(e) {
+    setData({ ...data, [e.target.name]: e.target.value });
+  }
 
-async function handleSubmit(e){
-e.preventDefault()
-setloading(true)
-try{
-const result=await axios.post(`${backend}/reactpost`,data)
+  async function handleSubmit(e) {
+    e.preventDefault();
+    setloading(true);
 
-console.log(result.data.message)
-setData({
-  title:"",
-  content:"",
-  author:""
-})
-setresmsg("Success")
-setmsg("Your Blog has Been Posted!")
-}
-catch(err){
-  console.log(err)
-  setresmsg("Failed to Post")
-  setmsg("Blog Can't be Posted!")
-}
-setloading(false)
-setopen(true)
-}
-const pstyle={
-    display:"flex",
-    justifyContent:"center",
-    alignItems:"Center",
+    try {
+      let result;
+
+      if (editingPost) {
+        result = await axios.patch(`${backend}/update-post/${editingPost._id}`, data);
+        setresmsg("Success");
+        setmsg("Your Blog has Been Updated!");
+        setData({ code: "", title: "", content: "", author: "" });
+      } else {
+        result = await axios.post(`${backend}/reactpost`, data);
+        setData({ title: "", content: "", author: "" });
+        setresmsg("Success");
+        const code = result.data.blog.code;
+        setmsg(`Your Blog has Been Posted! Your Blog Code is: ${code}. Please Remember this code to edit/delete this post`);
+      }
+
+    } catch (err) {
+      console.log(err);
+      setresmsg("Failed");
+      setmsg("Something went wrong!");
+    }
+
+    setloading(false);
+    setopen(true);
+  }
+
+  const pageStyle = {
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
     fontFamily: "Winky Sans",
     fontWeight: "500",
-}
-const fstyle={
-    height:"100%",
-    width:"100%",
-    textAlign:"center",
-    margin:"20px"
-}
+    padding: "20px",
+    flexDirection: "column"
+  };
 
-const contentstyle={
-    fontWeight:"Bold",
-    border: "1px solid #ccc",
+  const formStyle = {
+    width: "100%",
+    maxWidth: "800px",
+    backgroundColor: "rgba(255, 255, 255, 0.05)",
+    borderRadius: "16px",
+    padding: "30px",
+    boxSizing: "border-box",
+    backdropFilter: "blur(5px)",
+  };
+
+  const labelStyle = {
+    display: "block",
+    textAlign: "left",
+    marginBottom: "8px",
+    marginTop: "16px",
+    fontSize: "18px",
+    color: "#fff"
+  };
+
+  const inputStyle = {
+    width: "100%",
+    minHeight: "45px",
     fontSize: "16px",
-    width:"95%", 
-    height:"300px",
-    borderRadius:"20px",
-    opacity:"0.5",
-    padding:"10px",
-    marginTop:"10px"
-    
-}
+    padding: "10px 14px",
+    borderRadius: "10px",
+    border: "1px solid #ccc",
+    opacity: 0.85,
+    marginBottom: "10px",
+    fontFamily: "inherit"
+  };
 
+  const textareaStyle = {
+    ...inputStyle,
+    height: "200px",
+    resize: "vertical"
+  };
 
-return (
-<div style={pstyle}>
-<div style={fstyle}>
-<form  onSubmit={handleSubmit}>
+  const buttonWrapper = {
+    marginTop: "20px",
+    display: "flex",
+    justifyContent: "center"
+  };
 
-<label style={{fontSize:"20px"}}>Title</label><br/>
-<input style={{width: "40%",  /* Screen ke hisaab se adjust ho */
-  maxWidth: "700px", /* Bahut bada na ho */
-  height: "50px", /* Thoda bada taki prominent lage */
-  fontSize: "20px", /* Title bada aur readable ho */
-  fontWeight: "bold",
-  padding: "10px",
-  borderRadius: "20px",
-  border: "1px solid #ccc",opacity:"0.5",marginBottom:"10px"}} name="title" required value={data.title} onChange={handleChange}/><br/>
+  return (
+    <div style={pageStyle}>
+      <div style={formStyle}>
+        <form onSubmit={handleSubmit}>
+          {data.code && <input type="hidden" name="code" value={data.code} />}
 
-<label style={{fontSize:"20px"}}>Content</label><br/>
+          <label style={labelStyle}>Title</label>
+          <input
+            style={inputStyle}
+            name="title"
+            required
+            value={data.title}
+            onChange={handleChange}
+          />
 
-<textarea style={contentstyle} placeholder="Start writing your thoughts..."
-required  name="content" value={data.content} onChange={handleChange}/><br/>
-<label>Written By: </label>
-<input style={{ marginLeft:"10px",width: "25%",maxWidth: "400px",
-  height: "40px", 
-  padding: "8px",
-  fontSize: "16px",
-  borderRadius: "20px",
-  border: "1px solid #ccc",
-  opacity:"0.5"}}required name="author" value={data.author} onChange={handleChange}/><br/>
-<Button variant='outlined' color="inherit" style={{marginTop:"15px"}} type="submit">{loading? (<> Posting... <CircularProgress size={25} color="inherit" style={{ marginLeft: 8 }}/> </>):("Post")}</Button>
-  </form>
-</div>
-<Dialog open={open} onClose={handleClose}>
+          <label style={labelStyle}>Content</label>
+          <textarea
+            style={textareaStyle}
+            placeholder="Start writing your thoughts..."
+            required
+            name="content"
+            value={data.content}
+            onChange={handleChange}
+          />
+
+          <label style={labelStyle}>Written By</label>
+          <input
+            style={inputStyle}
+            required
+            name="author"
+            value={data.author}
+            onChange={handleChange}
+          />
+
+          <div style={buttonWrapper}>
+            <Button
+              variant="outlined"
+              color="inherit"
+              type="submit"
+              disabled={loading}
+            >
+              {loading ? (
+                <>
+                  {editingPost ? "Updating..." : "Posting..."}
+                  <CircularProgress
+                    size={20}
+                    color="inherit"
+                    style={{ marginLeft: 8 }}
+                  />
+                </>
+              ) : (
+                editingPost ? "Update" : "Post"
+              )}
+            </Button>
+          </div>
+        </form>
+      </div>
+
+      <Dialog open={open} onClose={handleClose}>
         <DialogTitle>{resmsg}</DialogTitle>
         <DialogContent>{msg}</DialogContent>
         <DialogActions>
-          <Button onClick={handleClose}>Close</Button>
+          <Button onClick={handleClose}>OK</Button>
         </DialogActions>
       </Dialog>
-</div>
+    </div>
+  );
+};
 
-)
-}
-export default PostCreation
-
-
+export default PostCreation;
