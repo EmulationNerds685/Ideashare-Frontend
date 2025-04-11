@@ -202,7 +202,9 @@ function delete_post(id){
     <div style={postStyle}>
       <h2>Blog Posts</h2>
       {loading ? (
-  <p>Fetching posts...<CircularProgress color="inherit"/></p>
+  <p>Fetching posts... <br/>
+<CircularProgress color="inherit"/>
+</p>
 ) : posts.length === 0 ? (
   <p>No Posts Available...</p>
 ) : (
