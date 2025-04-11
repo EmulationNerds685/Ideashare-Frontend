@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 
 import { useEffect, useState } from "react";
 import axios from "axios";
@@ -11,6 +12,7 @@ import {
   Box,
   Stack,
   Typography,
+  CircularProgress
 } from "@mui/material";
 
 import { useNavigate } from "react-router-dom";
@@ -200,7 +202,7 @@ function delete_post(id){
     <div style={postStyle}>
       <h2>Blog Posts</h2>
       {loading ? (
-  <p>Fetching posts...</p>
+  <p>Fetching posts...<CircularProgress color="inherit"/></p>
 ) : posts.length === 0 ? (
   <p>No Posts Available...</p>
 ) : (
