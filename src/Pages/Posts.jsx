@@ -22,7 +22,8 @@ const Post = () => {
   const [verbox, setverbox] = useState(false);
   const [opendel, setopendel] = useState(false);
   const [NotAccess, setNotAccess] = useState(false);
-  
+  const [loading, setLoading] = useState(true);
+
   const [cnf, setcnf] = useState(false);
   const [cnfdel,setcnfdel]=useState(false)
   const [posts, setPosts] = useState([]);
@@ -39,21 +40,25 @@ const Post = () => {
   
   useEffect(() => {
     axios
-    .get(`${backend}/post`)
-    .then((response) => {
-      const fetchedPosts = response.data;
-      setPosts(fetchedPosts);
-      
-      const initState = {};
-      fetchedPosts.forEach((post) => {
-        initState[post._id] = false;
+      .get(`${backend}/post`)
+      .then((response) => {
+        const fetchedPosts = response.data;
+        setPosts(fetchedPosts);
+  
+        const initState = {};
+        fetchedPosts.forEach((post) => {
+          initState[post._id] = false;
+        });
+        setExpandedPosts(initState);
+      })
+      .catch((error) => {
+        console.error("Error fetching posts:", error);
+      })
+      .finally(() => {
+        setLoading(false); // Stop loading after fetch is done
       });
-      setExpandedPosts(initState);
-    })
-    .catch((error) => {
-      console.error("Error fetching posts:", error);
-    });
   }, []);
+  
   
   const toggleExpand = (id) => {
     setExpandedPosts((prev) => ({
@@ -194,9 +199,12 @@ function delete_post(id){
   return (
     <div style={postStyle}>
       <h2>Blog Posts</h2>
-      {posts.length === 0 ? (
-        <p>No Posts Available...</p>
-      ) : (
+      {loading ? (
+  <p>Fetching posts...</p>
+) : posts.length === 0 ? (
+  <p>No Posts Available...</p>
+) : (
+
         posts.map((post) => {
           const isExpanded = expandedPosts[post._id];
           const isLongContent = post.content.length > 300;
