@@ -2,6 +2,7 @@ import "../about.css";
 const About = () => {
   return (
     <div className="about-container">
+        <h1 style={{textAlign:"center"}}>About</h1>
       <h1>Ideashare Blogging Website – A MERN Stack Project</h1>
       <p>
         As a part of integrating the various technologies I've learned from the
