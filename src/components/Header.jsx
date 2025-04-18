@@ -79,7 +79,7 @@ const Header = () => {
         <div style={navContainerStyle}>
           <Link to="/" style={navstyle}>Home</Link>
           <Link to="/about" style={navstyle}>About</Link>
-          <Link to="/services" style={navstyle}>Services</Link>
+          
           <Link to="/posts" style={navstyle}>Blogs</Link>
           <Link to="/contact" style={navstyle}>Contact</Link>
         </div>

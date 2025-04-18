@@ -1,0 +1,20 @@
+.about-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  line-height: 1.6;
+  background-color: rgba(255, 255, 255, 0.8); /* Light background with transparency */
+  border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  color: #222;
+}
+
+.about-container h1,
+.about-container h2 {
+  color: #111;
+}
+
+.about-container p {
+  color: #333;
+}
